@@ -178,16 +178,6 @@ ai_prompt_hint: ""
 - 실험 재현성 깨뜨리는 변경 시 명시적인 주석 추가
 
 ---
-## 📈 로드맵 (예시)
-- [ ] 기본 동역학 & 적분 기초 정리
-- [ ] 2D 충돌 검출 (AABB, Circle, SAT) 문서화
-- [ ] Impulse 기반 반응 + 마찰 공식 예시
-- [ ] Broad Phase 구조(BVH, Sweep & Prune) 비교표
-- [ ] 안정성 vs 성능 적분법 벤치마크 실험
-- [ ] PBD(Cloth) 간단 구현 실험
-- [ ] 네트워크 동기화 기초 (Client Prediction) 초안
-
----
 ## ❓ AI에게 질의할 때 권장 문장
 "이 저장소의 문서 구조와 메타데이터 규칙을 따르면서, Semi-Implicit Euler와 Verlet 차이점을 안정성/성능/에너지 보존 관점 표로 만들어줘. 관련 slug 후보도 제안해줘."
 
