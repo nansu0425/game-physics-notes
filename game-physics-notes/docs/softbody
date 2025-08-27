@@ -1,0 +1,4 @@
+for each particle in softBody:
+    force = calculateForces(particle)
+    particle.velocity += force * dt
+    particle.position += particle.velocity * dt

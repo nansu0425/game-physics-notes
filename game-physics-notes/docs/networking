@@ -1,0 +1,5 @@
+# 클라이언트에서의 예측 구현 예시
+def predict_movement(current_state, dt):
+    # 물리 법칙에 따라 다음 상태 예측
+    next_state = current_state + current_state.velocity * dt
+    return next_state
