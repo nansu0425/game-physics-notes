@@ -118,8 +118,9 @@ AI에게 문맥을 제대로 전달하기 위한 기본 System Prompt 예시:
 
 ---
 ## 🧱 코드 스니펫 스타일
+- 프로그래밍 언어로 C++ 사용
 - 물리적 단위 명확 (`// unit: meters`, `// seconds` 주석)
-- 마법 숫자 → 상수 (`const float EPSILON = 1e-5f;`)
+- 매직 넘버 → 상수 (`const float EPSILON = 1e-5f;`)
 - 가능하면 결정적(deterministic) 재현 (seed 고정)
 - 한 스니펫은 한 개념 (예: "Impulse Resolution (2D) 기본 형태")
 
