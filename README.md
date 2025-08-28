@@ -1,150 +1,59 @@
-# Game Physics Notes
+# 게임 물리 노트 (Game Physics Notes)
 
-게임 프로그래밍에서 필요한 물리(Physics) 이론 · 기법 · 구현 아이디어를 체계적으로 정리하고, 재사용 가능한 코드 스니펫/메모를 축적하기 위한 저장소입니다. 이 저장소는 **정확한 개념 정리 + 실용적인 구현 관점 + 성능/안정성 트레이드오프**를 동시에 추구하며, 문서 작성과 아이디어 확장을 위해 **AI 도구를 적극 활용**합니다.
+## 1. 리포지토리 목적
+이 저장소는 게임 물리 프로그래밍에 필요한 지식을 정리하기 위해 만들어졌습니다. 각 문서는 특정 게임 물리 관련 주제에 대해 다루고, 이론 관점에서 시작해서 구현 관점으로 이어지도록 작성됩니다.
 
----
-## 🎯 저장소 핵심 목표
-1. 게임 물리의 핵심 토픽을 폭넓고 (필요 시) 깊게 구조화된 문서로 축적
-2. 각 개념마다: 수학적 정의 → 직관적 설명 → 게임 적용 포인트 → 구현/최적화 팁 → 참고 문헌 순 흐름 유지
-3. 코드 스니펫과 파생 노트 연결성 확보
-4. AI가 문맥을 쉽게 이해하고 관련 답변/요약/확장을 돕도록 **메타데이터 + 일관 템플릿** 제공
-5. 점진적 개선(Incremental refinement) 기록: 초안 → 검수 → 확정
+## 2. 대상 독자 수준
+- 수학: 대학교 1~2학년 수준의 미적분과 선형대수를 배웠다고 가정합니다.
+- 물리: 뉴턴 역학의 기초(힘, 가속도, 운동 방정식, 에너지 보존 등) 정도만 알고 있다고 가정합니다.
+- 프로그래밍: C++ 문법에 익숙하고, 컴퓨터공학 전공자 수준의 CS 지식이 있다고 가정합니다.
 
----
-## 📌 범위 (Scope)
-포함 (In-Scope):
-- 고전역학 기초 (질량-힘-가속도, 에너지, 운동량, 관성 모멘트)
-- 수치적분 (Explicit/Implicit Euler, Semi-Implicit, Verlet, RK 계열, Position Based Dynamics 등)
-- 충돌 검출 (Broad Phase, Narrow Phase, SAT, GJK, EPA, Spatial Partitioning)
-- 충돌 반응 & 해결 (Impulse, Sequential Impulse, Constraint Solvers)
-- 강체(Rigid Body) / 관절(Joint) / 제약(Constraint)
-- 연성체(Soft Body), Cloth, Particle Systems, Fluid(기초)
-- 안정성 & 튜닝 (떨림, 침투, 에너지 폭주 방지)
-- 고정 시간 스텝 / 가변 시간 스텝 처리
-- 네트워크 동기화(예: Client-side Prediction, Reconciliation)에서의 물리 고려
-- 성능 최적화 (SIMD 개요, 캐시 친화 데이터 배치, 프로파일링 포인트)
+## 3. 작성 원칙
+1. **공식만 나열 금지**: 반드시 직관적 설명과 단계적 유도 과정을 포함합니다.  
+2. **수식 표기**: GitHub Markdown에서 지원되는 LaTeX 문법 사용 (인라인: `\( F = ma \)`, 블록: `$$ F = ma $$`).  
+3. **C++ 예제 코드 제공**: 가능한 최소한의 의존성으로 순수한 개념 전달에 집중합니다 (표준 라이브러리 + 직접 정의한 간단한 수학 타입).  
+4. **이론 ↔ 구현 연결**: 연속(continuous) 물리 모델 → 이산(discrete) 타임스텝 → 수치 오차(Error Source) → 보정(Drift / Error Mitigation) 순으로 서술합니다.  
+5. **안정성 & 한계 명시**: 각 기법의 장점, 단점, 수치적 불안정 요인(에너지 폭주, 분해능 한계 등), 개선 방향(PID damping, Baumgarte, warm starting 등)을 함께 기록합니다.  
+6. **용어 병기**: 처음 등장하는 핵심 용어는 한글(영문) 병기: 예) 관성 텐서(Inertia Tensor).  
+7. **재현 가능한 실험**: 초기 조건, 파라미터, 기대 결과(또는 그래프 형태)를 명시해 독자가 동일 결과를 재현 가능하도록 합니다.  
+8. **성능 관점 병기**: O( ) 복잡도, 캐시 친화성(cache locality), 분기(branch) 영향, SIMD 가능성 등을 간단 코멘트.  
+9. **디버깅 팁**: 시각화(벡터 화살표, AABB 경계), 어설션, NaN 감지, 에너지 로그 기록 방법을 간단 소개.
 
-제외 (Out-of-Scope / 별도 저장소 권장):
-- 렌더링/셰이딩 세부 기술
-- 일반 AI/머신러닝 기법 (단, 물리 파라미터 추정에 쓰일 때는 예외)
-- 사운드 물리 (음향 전파 등)
+## 4. 문서 구조(예시 템플릿)
 
----
-## 🗂️ 제안 디렉터리 구조 (초기 가이드)
 ```
-docs/                  # 개념 · 이론 · 정리 문서 (Markdown)
-	fundamentals/        # 물리 기초
-	dynamics/            # 운동학/동역학/적분
-	collision/           # 충돌 검출/반응
-	constraints/         # 제약/관절
-	softbody/            # 연성체/Cloth/Fluid 기초
-	optimization/        # 성능/안정성/튜닝
-	networking/          # 네트워크 물리 동기화
-	references/          # 참고 문헌/논문 요약
-
-snippets/              # 재사용 가능한 소규모 코드 조각
-assets/                # 도식, 이미지, GIF, 수식 렌더 결과
-meta/                  # 템플릿, 가이드, 태그 사전
-```
-실제 사용하면서 필요에 따라 조정/확장합니다.
-
----
-## 🧩 문서 파일 네이밍 & 분할 원칙
-- 한 파일은 하나의 “핵심 질문” 또는 “단일 명확한 개념”에 집중 (SRP)
-- 파일명: `topic-subtopic-shortslug.md` (영문 소문자, 하이픈 구분)
-- 너무 길어지면 `part-1`, `part-2` 등 분리
-- 복합 개념 개요 vs 세부 파생: `overview` / `details` 명시 가능
-
----
-## 🏷️ 메타데이터 (Front Matter) 규칙
-모든 주요 문서는 상단에 YAML Front Matter 포함:
-```yaml
----
-title: Rigid Body Dynamics Basics
-slug: rigid-body-basics
-topics: [rigid-body, inertia, integration]
-level: intermediate        # intro | intermediate | advanced
-status: draft              # draft | review | stable
-last_update: 2025-08-28
-summary: 관성 모멘트와 회전 운동 방정식의 게임 물리 적용 개요.
-refs: [featherstone, box2d, bullet]
-ai_prompt_hint: "질문이 오면 에너지 보존 여부와 수치 안정성 고려를 함께 설명해줘."
----
-```
-AI 프롬프트 품질 향상을 위해 `summary`, `ai_prompt_hint` 필드를 적극 활용합니다.
-
-상태 워크플로:
-`draft` → (자가 1차 검수) → `review` → (수정/보강) → `stable`
-
----
-## 🧱 코드 스니펫 스타일
-- 프로그래밍 언어로 C++ 사용
-- 물리적 단위 명확 (`// unit: meters`, `// seconds` 주석)
-- 매직 넘버 → 상수 (`const float EPSILON = 1e-5f;`)
-- 가능하면 결정적(deterministic) 재현 (seed 고정)
-- 한 스니펫은 한 개념 (예: "Impulse Resolution (2D) 기본 형태")
-
----
-## 📝 신규 문서 템플릿 (복사해서 사용)
-```markdown
----
-title: <Title>
-slug: <kebab-slug>
-topics: [ ]
-level: intro
-status: draft
-last_update: 2025-08-28
-summary: <한두 문장 요약>
-refs: [ ]
-ai_prompt_hint: ""
----
-
-## 1. 개요
-핵심 정의 및 문제 맥락.
-
-## 2. 수식 / 핵심 개념
-필요 수식 + 직관 해설.
-
-## 3. 게임 적용 포인트
-실용적 고려(성능/정확도/안정성).
-
-## 4. 예시 / 의사코드
-간단 구현 or pseudo.
-
-## 5. 튜닝 & Pitfall
-실수 사례 / 수치 폭주 조건.
-
-## 6. 추가 확장
-관련 심화 주제.
-
-## 7. 참고
-문헌 / 엔진 구현 레퍼런스.
+# 제목
+## 1. 문제 배경 / 직관
+## 2. 핵심 개념 정리
+## 3. 수식 유도
+## 4. 이산화 (시뮬레이션 관점)
+## 5. C++ 구현 예시
+## 6. 수치 안정성 / 에러 분석
+## 7. 확장 / 변형 기법
+## 8. 참고 자료
 ```
 
----
-## 📚 참고 리소스 (초기 셋)
-- Box2D / Erin Catto GDC 강연 자료
-- Bullet Physics Paper & 구현 노트
-- Chris Hecker Rigid Body Articles
-- David Baraff 강의 노트 (An Introduction to Physically Based Modeling)
-- GJK / EPA 원 논문
-- Position Based Dynamics (Müller et al.)
-- Featherstone: Rigid Body Dynamics Algorithms
+섹션별 가이드:
+1. 문제 배경 / 직관: 게임 플레이 맥락(예: 플랫폼 점프, 탄환, 캐릭터 충돌)과 해결하려는 물리 현상 정의.
+2. 핵심 개념 정리: 필요한 물리/수학 용어, 기호 표, 적용/배제한 가정(무마찰, 강체 등).
+3. 수식 유도: 고등학교/기초 미적분 수준에서 따라갈 수 있도록 단계식 전개, 중간 변형 생략 금지, 단위 분석(Optional).
+4. 이산화 (시뮬레이션 관점): 연속 방정식을 선택한 적분/솔버(예: Semi-Implicit Euler, Verlet, Sequential Impulse)로 옮기는 과정과 오차 항(Truncation, Drift) 언급.
+5. C++ 구현 예시: 핵심 자료구조(Struct/Component), 함수 시그니처, 업데이트 순서(Pipeline)와 의사코드 → 실제 코드. 외부 라이브러리 의존 최소화.
+6. 수치 안정성 / 에러 분석: 실패 패턴(폭주, 떨림, 터널링), 원인 파라미터(dt, iteration count, penetration depth), 측정/로그 방법(에너지 그래프, 침투 통계).
+7. 확장 / 변형 기법: 고급 또는 대안(예: Quaternion 기반 개선, Warm Starting, SIMD 최적화, CCD 도입 시 변화).
+8. 참고 자료: 책/논문/강연/코드 링크. 재구현 재현성 있는 최소 셋만 우선.
 
-`docs/references/` 폴더에 논문 요약 및 구현 주의점을 점진적으로 추가합니다.
+선택적 하위 섹션(필요 시):
+- 프로파일링(Profiling): 병목 함수, 캐시 미스 징후.
+- 디버깅(Visualization & Debug): DrawLine, AABB Overlay, Contact Normal 표시 방법.
+- 결정성(Determinism) 주의: 멀티스레드/float 연산 순서 영향.
 
----
-## 🔄 버전 관리 & 변경 로그
-- 큰 구조 변화나 개념 재작성 시 `meta/CHANGELOG.md` 생성/갱신 권장
-- 결정적(deterministic) 가정이나 수치 안정성에 영향을 주는 변경 시 명시적 주석 추가
+## 5. 용어 스타일 가이드
+- 첫 등장: 마찰 계수(Coefficient of Friction)  
+- 반복 등장 이후: 마찰 계수  
+- 약어 사용 전 풀네임 1회 표기 (예: Time of Impact(TOI))
 
----
-## ❓ AI에게 질의할 때 권장 문장
-"이 저장소의 문서 구조와 메타데이터 규칙을 따르면서, Semi-Implicit Euler와 Verlet 차이점을 안정성/성능/에너지 보존 관점 표로 만들어줘. 관련 slug 후보도 제안해줘."
-
----
-## 🙋 문의 / 메모
-구조화되지 않은 아이디어나 TODO는 `meta/quick-notes.md`(빠른 덤프) → 추후 구조화된 문서로 승격.
-
----
-이 README는 저장소 *문맥(높은 레벨 목적 + 구조 + AI 상호작용 규칙)* 을 AI와 사람이 모두 빠르게 파악할 수 있도록 설계되었습니다. 필요 시 언제든지 개선합니다.
+## 6. 참고(References) 예시 포맷
+- 책: David H. Eberly, "Game Physics" (Morgan Kaufmann, 2010)  
+- 논문: Erin Catto, "Iterative Dynamics with Temporal Coherence," GDC (연도).  
+- 웹: GDC Vault, SIGGRAPH 자료 등 (URL 첨부)
