@@ -34,44 +34,55 @@
 
 $$ v_A = \frac{m_A - m_B}{m_A + m_B} u_A + \frac{2 m_B}{m_A + m_B} u_B, \quad v_B = \frac{2 m_A}{m_A + m_B} u_A + \frac{m_B - m_A}{m_A + m_B} u_B $$
 
+
 ### 3.2 1D 일반 (부분 탄성) – 탄성 계수 e 도입
 완전 탄성의 상대 속도 반전 조건을 일반화:
 
 $$ v_B - v_A = - e (u_B - u_A), \quad 0 \le e \le 1 $$
+
 운동량 보존 식은 동일. 연립하여 얻는 충돌 후 속도:
 
 $$ v_A = u_A + \frac{-(1+e) m_B}{m_A + m_B}(u_A - u_B), \qquad v_B = u_B + \frac{ (1+e) m_A}{m_A + m_B}(u_A - u_B) $$
+
 위 식을 정리하면 더 익숙한 형태:
 
 $$ v_A = \frac{m_A - e m_B}{m_A + m_B} u_A + \frac{(1+e) m_B}{m_A + m_B} u_B, \quad v_B = \frac{(1+e) m_A}{m_A + m_B} u_A + \frac{m_B - e m_A}{m_A + m_B} u_B $$
+
 
 ### 3.3 Impulse(충격량) 관점 (게임 구현 친화)
 1D에서 상대 속도의 법선 성분을 $v_{rel,n} = u_B - u_A$ 라 하면, 충돌 후 원하는 법선 상대 속도:
 
 $$ v'_{rel,n} = - e \, v_{rel,n} $$
+
 속도 변화량(법선 방향) 조건:
 
 $$ \Delta v_{rel,n} = v'_{rel,n} - v_{rel,n} = -(1+e) v_{rel,n} $$
+
 Impulse j 적용 시 (각 물체 속도 변화: $\Delta u = \pm j / m$):
 
 $$ \Delta v_{rel,n} = -\frac{j}{m_A} - \frac{j}{m_B} = - j \left(\frac{1}{m_A} + \frac{1}{m_B}\right) $$
+
 따라서
 
 $$ j = \frac{(1+e) v_{rel,n}}{\frac{1}{m_A} + \frac{1}{m_B}} = (1+e) \frac{v_{rel,n}}{m_A^{-1} + m_B^{-1}} $$
+
 그러나 구현에서는 **접근 중인지 검사**가 필요: 만약 $v_{rel,n} < 0$ (서로 접근) 일 때만 반응. (법선 방향 정의에 따라 부호 주의; 아래 2D 파트에서 일반화.)
 
 ### 3.4 2D (및 3D) 로 일반화
 충돌 반응은 **법선 방향 성분만** 수정. 접선(마찰 제외 시) 성분은 유지. 두 물체 속도 $\mathbf{v}_A, \mathbf{v}_B$, 단위 법선 $\mathbf{n}$:
 
 $$ v_{rel,n} = (\mathbf{v}_B - \mathbf{v}_A)\cdot \mathbf{n} $$
+
 접근 중인지 검사: $v_{rel,n} > 0$ 이면 서로 멀어짐 → 충돌 처리 생략. (여기서는 $\mathbf{n}$ 을 A → B 방향으로 가정.)
 
 Impulse 스칼라 값:
 
 $$ j = - (1 + e) \frac{v_{rel,n}}{m_A^{-1} + m_B^{-1}} $$
+
 속도 갱신:
 
 $$ \mathbf{v}_A' = \mathbf{v}_A - j \; m_A^{-1} \mathbf{n}, \quad \mathbf{v}_B' = \mathbf{v}_B + j \; m_B^{-1} \mathbf{n} $$
+
 
 완전 비탄성($e=0$)일 경우 법선 상대 속도는 0이 되므로 두 물체는 법선 방향 상대 운동을 잃고(끈적하게 붙는 듯한 효과) 접선 운동만 남습니다.
 
